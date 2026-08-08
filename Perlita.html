@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Quieres un beso mío?</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        text-align: center;
+        overflow: hidden;
+        position: relative;
+        background: linear-gradient(-45deg, #ff4d6d, #ff8fa3, #c9184a, #ff758f);
+        background-size: 400% 400%;
+        animation: gradientMove 12s ease infinite;
+    }
+
+    @keyframes gradientMove {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Capa suave para dar profundidad */
+    .overlay {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.25) 100%);
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    /* Corazones y besos flotando */
+    .flotante {
+        position: absolute;
+        top: 110%;
+        z-index: 1;
+        user-select: none;
+        pointer-events: none;
+        animation-name: subir;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        opacity: 0.9;
+    }
+
+    @keyframes subir {
+        0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+        10%  { opacity: 1; }
+        90%  { opacity: 1; }
+        100% { transform: translateY(-115vh) rotate(25deg); opacity: 0; }
+    }
+
+    #pantalla-principal {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        animation: apareceSuave 1s ease;
+    }
+
+    @keyframes apareceSuave {
+        from { opacity: 0; transform: translateY(15px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+        color: #ffffff;
+        margin-bottom: 35px;
+        text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.35);
+        font-size: 2.6rem;
+        max-width: 90vw;
+    }
+
+    .subtitulo {
+        color: #fff0f3;
+        margin-top: -18px;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+        line-height: 1.5;
+        text-shadow: 1px 1px 6px rgba(0,0,0,0.3);
+    }
+
+    .subtitulo:last-of-type {
+        margin-bottom: 30px;
+    }
+
+    @media (max-width: 480px) {
+        .subtitulo {
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+        .subtitulo:last-of-type {
+            margin-bottom: 34px;
+        }
+    }
+
+    .botones {
+        position: relative;
+        width: 300px;
+        height: 100px;
+    }
+
+    button {
+        padding: 14px 34px;
+        font-size: 20px;
+        font-weight: bold;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.35);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:active {
+        transform: scale(0.95);
+    }
+
+    #si {
+        background-color: #ffffff;
+        color: #c9184a;
+        position: absolute;
+        left: 30px;
+        animation: latido 1.3s ease-in-out infinite;
+    }
+
+    #si:hover {
+        transform: scale(1.08);
+    }
+
+    @keyframes latido {
+        0%, 100% { transform: scale(1); }
+        50%      { transform: scale(1.06); }
+    }
+
+    #no {
+        background-color: rgba(255,255,255,0.25);
+        color: #ffffff;
+        border: 2px solid #ffffff;
+        position: absolute;
+        right: 30px;
+        transition: all 0.15s ease;
+    }
+
+    /* Pantalla de éxito */
+    #pantalla-exito {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(-45deg, #ff4d6d, #ff8fa3, #c9184a, #ff758f);
+        background-size: 400% 400%;
+        animation: gradientMove 12s ease infinite, fadeIn 1s ease-in-out forwards;
+        z-index: 10;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    #pantalla-exito h2 {
+        position: relative;
+        z-index: 12;
+        color: #c9184a;
+        font-size: 2.6rem;
+        background: rgba(255, 255, 255, 0.92);
+        padding: 25px 40px;
+        border-radius: 24px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+        max-width: 85%;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    }
+
+    #pantalla-exito .linea-extra {
+        display: block;
+        margin-top: 14px;
+        font-size: 0.55em;
+        color: #e91e63;
+    }
+
+    @media (max-width: 480px) {
+        #pantalla-exito h2 {
+            font-size: 2rem;
+            padding: 22px 26px;
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+</style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<!-- Corazones y besos flotantes, generados por JS -->
+<div id="contenedor-flotantes"></div>
+
+<!-- Pantalla Principal -->
+<div id="pantalla-principal">
+    <h1>¿Quieres un beso mío?</h1>
+    <p class="subtitulo">(la respuesta correcta ya la sabes 😏)</p>
+    <p class="subtitulo">prueba con el no y verás que hasta el destino se niega</p>
+    <div class="botones">
+        <button id="si" onclick="aceptarBeso()">Sí 💋</button>
+        <button id="no" onmouseover="moverNo()" onclick="moverNo()">No</button>
+    </div>
+</div>
+
+<!-- Pantalla de éxito -->
+<div id="pantalla-exito">
+    <h2>sabías que no te ibas a negar Bebé 😘❤️<br><span class="linea-extra">dime a qué hora llego por ti</span></h2>
+</div>
+
+<!-- Música de fondo: reemplaza "cancion.mp3" por el archivo que quieras usar -->
+<audio id="musica" loop>
+    <source src="cancion.mp3" type="audio/mpeg">
+    Tu navegador no soporta audio.
+</audio>
+
+<script>
+    const emojis = ['❤️', '💋', '💖', '😘', '💗', '💕'];
+    const contenedor = document.getElementById('contenedor-flotantes');
+    const totalFlotantes = 22;
+
+    for (let i = 0; i < totalFlotantes; i++) {
+        const span = document.createElement('span');
+        span.className = 'flotante';
+        span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.fontSize = (16 + Math.random() * 26) + 'px';
+        span.style.animationDuration = (7 + Math.random() * 10) + 's';
+        span.style.animationDelay = (Math.random() * 10) + 's';
+        contenedor.appendChild(span);
+    }
+
+    function moverNo() {
+        const btnNo = document.getElementById('no');
+        const margen = 20;
+        const anchoBoton = btnNo.offsetWidth;
+        const altoBoton = btnNo.offsetHeight;
+        const x = margen + Math.random() * (window.innerWidth - anchoBoton - margen * 2);
+        const y = margen + Math.random() * (window.innerHeight - altoBoton - margen * 2);
+
+        btnNo.style.position = 'fixed';
+        btnNo.style.left = x + 'px';
+        btnNo.style.top = y + 'px';
+
+        // Cada vez que se escapa, el botón "Sí" crece un poquito más
+        const btnSi = document.getElementById('si');
+        const escalaActual = parseFloat(btnSi.dataset.escala || 1);
+        const nuevaEscala = Math.min(escalaActual + 0.06, 1.6);
+        btnSi.dataset.escala = nuevaEscala;
+        btnSi.style.transform = `scale(${nuevaEscala})`;
+    }
+
+    function aceptarBeso() {
+        document.getElementById('pantalla-principal').style.display = 'none';
+        document.getElementById('pantalla-exito').style.display = 'flex';
+
+        const cancion = document.getElementById('musica');
+        cancion.play().catch(() => {
+            console.log('El navegador bloqueó la reproducción automática, se necesita interacción.');
+        });
+    }
+</script>
+
+</body>
+</html>
