@@ -201,6 +201,109 @@
         from { opacity: 0; }
         to   { opacity: 1; }
     }
+
+    /* Corazón discreto para la dedicatoria */
+    #boton-recordar {
+        position: fixed;
+        bottom: 22px;
+        right: 22px;
+        z-index: 20;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.35);
+        border: none;
+        padding: 10px 16px;
+        border-radius: 50px;
+        color: #ffffff;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        backdrop-filter: blur(4px);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+        animation: latidoSuave 2.4s ease-in-out infinite;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.25);
+    }
+
+    #boton-recordar .icono {
+        font-size: 1.1rem;
+    }
+
+    @keyframes latidoSuave {
+        0%, 100% { transform: scale(1); }
+        50%      { transform: scale(1.07); }
+    }
+
+    /* Panel de dedicatoria */
+    #panel-dedicatoria {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.45);
+        padding: 20px;
+        animation: fadeIn 0.35s ease-in-out forwards;
+    }
+
+    #panel-dedicatoria .tarjeta {
+        background: #fff5f7;
+        border-radius: 24px;
+        padding: 38px 32px;
+        max-width: 460px;
+        width: 100%;
+        box-shadow: 0 15px 45px rgba(0,0,0,0.35);
+        position: relative;
+        text-align: left;
+        animation: apareceSuave 0.4s ease;
+    }
+
+    #panel-dedicatoria .eyebrow {
+        color: #e91e63;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    #panel-dedicatoria p {
+        color: #7a1030;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin-bottom: 14px;
+    }
+
+    #panel-dedicatoria .firma {
+        margin-top: 18px;
+        color: #c9184a;
+        font-weight: 700;
+        font-size: 1rem;
+        text-align: right;
+    }
+
+    #cerrar-dedicatoria {
+        position: absolute;
+        top: 14px;
+        right: 18px;
+        background: none;
+        border: none;
+        font-size: 1.4rem;
+        color: #c9184a;
+        cursor: pointer;
+        box-shadow: none;
+        padding: 4px;
+    }
+
+    @media (max-width: 480px) {
+        #panel-dedicatoria .tarjeta {
+            padding: 30px 22px;
+        }
+        #panel-dedicatoria p {
+            font-size: 0.98rem;
+        }
+    }
 </style>
 </head>
 <body>
@@ -224,6 +327,22 @@
 <!-- Pantalla de éxito -->
 <div id="pantalla-exito">
     <h2>sabías que no te ibas a negar Bebé 😘❤️<br><span class="linea-extra">dime a qué hora llego por ti</span></h2>
+</div>
+
+<!-- Corazón discreto: se toca cuando quiera leer la dedicatoria -->
+<button id="boton-recordar" onclick="abrirDedicatoria()">
+    <span class="icono">💗</span> recuérdate
+</button>
+
+<!-- Panel con la dedicatoria -->
+<div id="panel-dedicatoria" onclick="cerrarSiEsFondo(event)">
+    <div class="tarjeta">
+        <button id="cerrar-dedicatoria" onclick="cerrarDedicatoria()">✕</button>
+        <p class="eyebrow">Para Perlita</p>
+        <p>Cada vez que un mal momento te pese, quiero que entres aquí y te acuerdes de esto: tus ojos tienen algo que a mí me detiene el tiempo, y tu pelo, tu sonrisa, esa que ilumina hasta el peor de mis días con solo verla.</p>
+        <p>Eres fenomenal, Perlita. No por lo que haces, sino simplemente por existir — tu sola presencia me recuerda lo especial que eres, y quiero que tú también te lo recuerdes, siempre que lo necesites.</p>
+        <p class="firma">con todo mi corazón 💗</p>
+    </div>
 </div>
 
 <!-- Música de fondo: reemplaza "cancion.mp3" por el archivo que quieras usar -->
@@ -271,11 +390,26 @@
     function aceptarBeso() {
         document.getElementById('pantalla-principal').style.display = 'none';
         document.getElementById('pantalla-exito').style.display = 'flex';
+        document.getElementById('boton-recordar').style.display = 'flex';
 
         const cancion = document.getElementById('musica');
         cancion.play().catch(() => {
             console.log('El navegador bloqueó la reproducción automática, se necesita interacción.');
         });
+    }
+
+    function abrirDedicatoria() {
+        document.getElementById('panel-dedicatoria').style.display = 'flex';
+    }
+
+    function cerrarDedicatoria() {
+        document.getElementById('panel-dedicatoria').style.display = 'none';
+    }
+
+    function cerrarSiEsFondo(evento) {
+        if (evento.target.id === 'panel-dedicatoria') {
+            cerrarDedicatoria();
+        }
     }
 </script>
 
