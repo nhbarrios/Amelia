@@ -134,6 +134,45 @@
       0%, 100% { transform: scale(1); opacity: 0.7; }
       50% { transform: scale(1.25); opacity: 1; }
     }
+    /* Final step: no card at all — just the name floating over the flowers */
+    #step-final.glass-card {
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: none;
+      box-shadow: none;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Full-screen grid of sunflowers that completely covers the sky-blue
+       background once the gift is opened — guarantees no gaps, unlike
+       random scatter. Sits above the background, below the name/canvas. */
+    #flower-wallpaper {
+      position: fixed;
+      inset: 0;
+      z-index: 6;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+      align-content: start;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    #flower-wallpaper span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      line-height: 1;
+      opacity: 0;
+      transform: scale(0.4);
+      animation: wallpaperPop 0.5s ease forwards;
+    }
+
+    @keyframes wallpaperPop {
+      to { opacity: 1; transform: scale(1); }
+    }
   </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 text-white">
@@ -232,6 +271,9 @@
       </p>
     </div>
 
+    <!-- Full-screen sunflower wallpaper, filled in once the gift is opened -->
+    <div id="flower-wallpaper"></div>
+
     <!-- FINAL STEP: Center Name with Full Screen Blossoms -->
     <div id="step-final" class="glass-card p-8 sm:p-12 text-center hidden transition-all duration-1000 transform float-animation">
       <div class="flex items-center justify-center gap-3 mb-4">
@@ -242,14 +284,6 @@
           </h1>
         </div>
         <span class="text-4xl sm:text-6xl animate-bounce">🌻</span>
-      </div>
-      <p class="text-xl sm:text-2xl text-yellow-200 font-serif-title italic mt-4 tracking-wide">
-        "Eres la luz de este día 💛"
-      </p>
-      <div class="mt-8">
-        <span class="inline-block py-2 px-5 rounded-full bg-yellow-400/20 border border-yellow-300/50 text-yellow-200 text-xs sm:text-sm">
-          ✨ Toca la pantalla cuantas veces quieras para llenar tu jardín ✨
-        </span>
       </div>
     </div>
 
@@ -302,7 +336,7 @@
     });
 
     function createTapFlower(x, y) {
-      const symbols = ['🌻', '🌻', '🌻', '🌼', '💛', '✨'];
+      const symbols = ['🌻', '🌻', '🌻', '🌻', '🌼', '💛'];
       const symbol = symbols[Math.floor(Math.random() * symbols.length)];
 
       const flower = document.createElement('div');
@@ -335,34 +369,41 @@
       if (finaleActive) return;
       finaleActive = true;
 
-      // Much denser rain in the background canvas
+      // Much denser rain in the background canvas — appears instantly
       particleCount = 320;
       spawnMoreParticles(260);
 
-      // Mass explosion of flowers across the entire viewport
-      const flowerSymbols = ['🌻', '🌻', '🌻', '🌼', '💛', '✨'];
-      for (let i = 0; i < 160; i++) {
+      // Mass explosion of YELLOW flowers across the entire viewport, all at once
+      // (mostly sunflowers, a few daisies — no hearts/sparkles diluting the yellow)
+      const flowerSymbols = ['🌻', '🌻', '🌻', '🌻', '🌼'];
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < 220; i++) {
+        const rx = Math.random() * window.innerWidth;
+        const ry = Math.random() * window.innerHeight;
+
+        const flower = document.createElement('div');
+        flower.className = 'tap-flower';
+        flower.innerText = flowerSymbols[Math.floor(Math.random() * flowerSymbols.length)];
+        flower.style.left = rx + 'px';
+        flower.style.top = ry + 'px';
+        flower.style.fontSize = (Math.random() * 2 + 2) + 'rem';
+        // tiny random delay so the pop-in still feels organic, not laggy
+        flower.style.animationDelay = (Math.random() * 0.25) + 's';
+
+        fragment.appendChild(flower);
+
         setTimeout(() => {
-          const rx = Math.random() * window.innerWidth;
-          const ry = Math.random() * window.innerHeight;
-
-          const flower = document.createElement('div');
-          flower.className = 'tap-flower';
-          flower.innerText = flowerSymbols[Math.floor(Math.random() * flowerSymbols.length)];
-          flower.style.left = rx + 'px';
-          flower.style.top = ry + 'px';
-          flower.style.fontSize = (Math.random() * 2 + 2) + 'rem';
-
-          document.body.appendChild(flower);
-
-          setTimeout(() => {
-            flower.remove();
-          }, 2000);
-        }, i * 15);
+          flower.remove();
+        }, 2400);
       }
+      document.body.appendChild(fragment);
+
+      // Full-screen wallpaper of sunflowers so the sky-blue background
+      // disappears completely — a grid guarantees no gaps, unlike random scatter
+      fillFlowerWallpaper();
 
       // A layer of sunflowers that settle near the bottom and STAY,
-      // so the screen keeps filling instead of only raining through
+      // filling in instantly so the screen feels flooded right away
       settleFlowers(MAX_SETTLED);
 
       // Keep the flood alive: gentle continuous bursts every few seconds
@@ -372,35 +413,45 @@
       }, 2500);
     }
 
+    function fillFlowerWallpaper() {
+      const wallpaper = document.getElementById('flower-wallpaper');
+      if (wallpaper.childElementCount > 0) return; // only fill once
+
+      const flowerSymbols = ['🌻', '🌻', '🌻', '🌻', '🌼'];
+      const cellSize = 46; // matches the grid's minmax() column width
+      const cols = Math.ceil(window.innerWidth / cellSize);
+      const rows = Math.ceil(window.innerHeight / cellSize);
+      const total = cols * rows;
+
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < total; i++) {
+        const span = document.createElement('span');
+        span.innerText = flowerSymbols[Math.floor(Math.random() * flowerSymbols.length)];
+        span.style.fontSize = (Math.random() * 0.8 + 1.5) + 'rem';
+        span.style.animationDelay = (Math.random() * 1.2) + 's';
+        fragment.appendChild(span);
+      }
+      wallpaper.appendChild(fragment);
+    }
+
     function settleFlowers(amount) {
-      const flowerSymbols = ['🌻', '🌻', '🌻', '🌼'];
-      let placed = 0;
-      const interval = setInterval(() => {
-        if (placed >= amount || settledCount >= MAX_SETTLED) {
-          clearInterval(interval);
-          return;
-        }
+      const flowerSymbols = ['🌻', '🌻', '🌻', '🌻', '🌼'];
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < amount; i++) {
         const flower = document.createElement('div');
         flower.innerText = flowerSymbols[Math.floor(Math.random() * flowerSymbols.length)];
         flower.style.position = 'fixed';
         flower.style.left = (Math.random() * 100) + 'vw';
-        flower.style.bottom = (Math.random() * 22) + 'vh';
+        flower.style.bottom = (Math.random() * 26) + 'vh';
         flower.style.fontSize = (Math.random() * 1.8 + 1.6) + 'rem';
-        flower.style.opacity = '0';
-        flower.style.transition = 'opacity 1.2s ease, transform 1.2s ease';
-        flower.style.transform = 'translateY(15px) scale(0.7)';
+        flower.style.opacity = String(Math.random() * 0.5 + 0.5);
+        flower.style.transform = 'scale(1)';
         flower.style.pointerEvents = 'none';
         flower.style.zIndex = '5';
-        document.body.appendChild(flower);
-
-        requestAnimationFrame(() => {
-          flower.style.opacity = String(Math.random() * 0.5 + 0.5);
-          flower.style.transform = 'translateY(0) scale(1)';
-        });
-
-        placed++;
+        fragment.appendChild(flower);
         settledCount++;
-      }, 60);
+      }
+      document.body.appendChild(fragment);
     }
 
     // Canvas background flower rain loop
@@ -443,7 +494,7 @@
     }
 
     function spawnMoreParticles(amount) {
-      const flowerSymbols = ['🌻', '🌻', '🌻', '🌻', '🌼', '💛', '✨'];
+      const flowerSymbols = ['🌻', '🌻', '🌻', '🌻', '🌻', '🌼', '💛'];
       for (let i = 0; i < amount; i++) {
         particles.push({
           x: Math.random() * window.innerWidth,
